@@ -1,6 +1,8 @@
 package com.examen.pokemon.controller;
 
 import com.examen.pokemon.dto.EntrenadorDTO;
+import com.examen.pokemon.dto.LoginRequest;
+import com.examen.pokemon.dto.LoginResponse;
 import com.examen.pokemon.model.Entrenador;
 import com.examen.pokemon.service.EntrenadorService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +37,20 @@ public class EntrenadorController {
                 .orElse(ResponseEntity.notFound().build()); // Or respond with a 404 Not Found status
     }
 
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponse> loginEntrenador(@RequestBody LoginRequest loginRequest) {
+        // Aquí debes implementar la lógica para buscar el UUID del usuario con el email proporcionado.
+        // Puedes usar el servicio de EntrenadorService para realizar esta búsqueda.
+        
+        // Supongamos que encontramos el UUID y lo almacenamos en una variable llamada 'uuid'
+        String uuid = "f3262c24-473d-437d-a5cf-e87673637954";
+        
+        // Creamos la respuesta
+        LoginResponse response = new LoginResponse();
+        response.setUuid(uuid);
+        
+        return ResponseEntity.ok(response);
+    }
 
     @PostMapping
     public ResponseEntity<EntrenadorDTO> createEntrenador(@RequestBody EntrenadorDTO entrenadorDTO) {
@@ -49,10 +65,18 @@ public class EntrenadorController {
         Entrenador existingEntrenador = entrenadorService.getEntrenadorById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Entrenador not found"));
         // Update the existing entity with DTO data
+        existingEntrenador.setNombre(entrenadorDTO.getNombre());
+        existingEntrenador.setApellido(entrenadorDTO.getApellido());
+        existingEntrenador.setFechaNacimiento(entrenadorDTO.getFechaNacimiento());
+        existingEntrenador.setFechaVinculacion(entrenadorDTO.getFechaVinculacion());
+        existingEntrenador.setEmail(entrenadorDTO.getEmail());
+        
+        // Guardar el Entrenador actualizado
         Entrenador updatedEntrenador = entrenadorService.saveEntrenador(existingEntrenador);
         EntrenadorDTO updatedEntrenadorDTO = convertToDTO(updatedEntrenador);
         return ResponseEntity.ok(updatedEntrenadorDTO);
     }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteEntrenador(@PathVariable Long id) {
